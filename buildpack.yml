@@ -1,0 +1,3 @@
+---
+dotnet-core:
+  sdk: 3.1
