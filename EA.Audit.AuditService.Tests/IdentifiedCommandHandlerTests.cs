@@ -1,6 +1,6 @@
-﻿using EA.Audit.AuditService.Application.Features.Audits.Commands;
-using EA.Audit.AuditService.Application.Features.Shared;
-using EA.Audit.AuditService.Infrastructure.Idempotency;
+﻿using EA.Audit.AuditService.Application.Features.Shared;
+using EA.Audit.Infrastructure.Application.Features.Audits.Commands;
+using EA.Audit.Infrastructure.Idempotency;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -80,7 +80,8 @@ namespace EA.Audit.AuditServiceTests.Application
                 actorId: args != null && args.ContainsKey("actorId") ? (int)args["actorId"] : 0,
                 actor: args != null && args.ContainsKey("actor") ? (string)args["actor"] : null,
                 description: args != null && args.ContainsKey("description") ? (string)args["description"] : null,
-                properties: args != null && args.ContainsKey("properties") ? (string)args["properties"] : null);
+                properties: args != null && args.ContainsKey("properties") ? (string)args["properties"] : null,
+                clientId: args != null && args.ContainsKey("clientId") ? (string)args["clientId"] : null);
 
         }
     }

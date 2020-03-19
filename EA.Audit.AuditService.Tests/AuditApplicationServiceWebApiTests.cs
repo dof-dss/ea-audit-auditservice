@@ -1,7 +1,7 @@
-﻿using EA.Audit.AuditService.Application.Commands;
-using EA.Audit.AuditService.Application.Features.Application.Queries;
-using EA.Audit.AuditService.Application.Features.Shared;
+﻿using EA.Audit.AuditService.Application.Features.Shared;
 using EA.Audit.AuditService.Controllers;
+using EA.Audit.Infrastructure.Application.Commands;
+using EA.Audit.Infrastructure.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -12,7 +12,7 @@ using System.Threading;
 using System.Threading.Tasks;
 
 namespace EA.Audit.AuditService.Tests
-{ 
+{
 
     [TestFixture]
     public class AuditApplicationServiceWebApiTests

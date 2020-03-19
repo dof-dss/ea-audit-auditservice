@@ -1,12 +1,14 @@
-﻿using EA.Audit.AuditService.Application.Features.Audits.Commands;
-using EA.Audit.AuditService.Application.Features.Audits.Queries;
-using EA.Audit.AuditService.Application.Features.Shared;
+﻿using EA.Audit.AuditService.Application.Features.Shared;
 using EA.Audit.AuditService.Controllers;
+using EA.Audit.Infrastructure.Application.Features.Audits.Commands;
+using EA.Audit.Infrastructure.Application.Features.Audits.Queries;
 using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NUnit.Framework;
+using StackExchange.Redis;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -18,6 +20,8 @@ namespace EA.Audit.AuditService.Tests
     {
         private readonly Mock<IMediator> _mediatorMock;
         private readonly Mock<ILogger<AuditController>> _loggerMock;
+        private readonly Mock<IConnectionMultiplexer> _connectionMultiplexerMock;
+        private readonly Mock<IHttpContextAccessor> _httpContentAccessor;
 
         public AuditServiceWebApiTests()
         {
@@ -29,12 +33,12 @@ namespace EA.Audit.AuditService.Tests
         public async Task Create_audit_with_requestId_success()
         {
             //Arrange
-            _mediatorMock.Setup(x => x.Send(It.IsAny<IdentifiedCommand<CreateAuditCommand, long>>(), default(CancellationToken)))
+            _mediatorMock.Setup(x => x.Send(It.IsAny<IdentifiedCommand<PublishAuditCommand, long>>(), default(CancellationToken)))
                 .Returns(Task.FromResult(10L));
 
             //Act
-            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object);
-            var actionResult = await auditController.CreateAuditAsync(new CreateAuditCommand(), Guid.NewGuid().ToString()) as OkObjectResult;
+            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object, _connectionMultiplexerMock.Object, _httpContentAccessor.Object);
+            var actionResult = await auditController.CreateAuditAsync(new PublishAuditCommand(), Guid.NewGuid().ToString()) as OkObjectResult;
 
             //Assert
             Assert.AreEqual(actionResult.StatusCode, (int)System.Net.HttpStatusCode.OK);
@@ -49,8 +53,8 @@ namespace EA.Audit.AuditService.Tests
                 .Returns(Task.FromResult(10L));
 
             //Act
-            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object);
-            var actionResult = await auditController.CreateAuditAsync(new CreateAuditCommand(), String.Empty) as BadRequestResult;
+            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object, _connectionMultiplexerMock.Object, _httpContentAccessor.Object);
+            var actionResult = await auditController.CreateAuditAsync(new PublishAuditCommand(), String.Empty) as BadRequestResult;
 
             //Assert
             Assert.AreEqual(actionResult.StatusCode, (int)System.Net.HttpStatusCode.BadRequest);
@@ -66,7 +70,7 @@ namespace EA.Audit.AuditService.Tests
                 .Returns(Task.FromResult(fakeDynamicResult));
 
             //Act
-            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object);
+            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object, _connectionMultiplexerMock.Object, _httpContentAccessor.Object);
             var actionResult = await auditController.GetAuditsAsync( new GetAuditsQuery() ) as OkObjectResult;
 
             //Assert
@@ -83,7 +87,7 @@ namespace EA.Audit.AuditService.Tests
                 .Returns(Task.FromResult(fakeDynamicResult));
 
             //Act
-            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object);
+            var auditController = new AuditController(_loggerMock.Object, _mediatorMock.Object, _connectionMultiplexerMock.Object, _httpContentAccessor.Object);
             var actionResult = await auditController.GetAuditAsync(10) as OkObjectResult;
 
             //Assert

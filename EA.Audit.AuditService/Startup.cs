@@ -1,4 +1,3 @@
-using EA.Audit.AuditService.Infrastructure;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -10,19 +9,20 @@ using Microsoft.OpenApi.Models;
 using MediatR;
 using AutoMapper;
 using System.Reflection;
-using EA.Audit.AuditService.Data;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using System;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Http;
-using EA.Audit.AuditService.Infrastructure.Idempotency;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using EA.Audit.AuditService.Infrastructure.Behaviours;
-using EA.Audit.AuditService.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authorization;
+using EA.Audit.Infrastructure.Idempotency;
+using EA.Audit.Infrastructure.Data;
+using EA.Audit.Infrastructure.Auth;
+using EA.Audit.Infrastructure;
+using Steeltoe.CloudFoundry.Connector.Redis;
 
 namespace EA.Audit.AuditService
 {
@@ -40,9 +40,11 @@ namespace EA.Audit.AuditService
         {
             var jwtSettings = JwtSettings.FromConfiguration(Configuration);
             services.AddSingleton(jwtSettings);
-            
-            services.AddAutoMapper(typeof(Startup).GetTypeInfo().Assembly);
-            services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
+            services.AddHttpContextAccessor();
+
+            var assembly = AppDomain.CurrentDomain.Load("EA.Audit.Infrastructure");
+            services.AddAutoMapper(assembly);
+            services.AddMediatR(assembly);
             services.AddControllers();            
 
             ConfigureAuthentication(services);
@@ -65,6 +67,8 @@ namespace EA.Audit.AuditService
             services.AddScoped<IRequestManager, RequestManager>();
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
             services.AddTransient<IAuditContextFactory, AuditContextFactory>();
+
+            services.AddRedisConnectionMultiplexer(Configuration);
 
         }
 
@@ -133,8 +137,6 @@ namespace EA.Audit.AuditService
         private void ConfigureAuditContext(IServiceCollection services)
         {
             services.AddDbContext<AuditContext>(options => options.UseMySql(Configuration));
-
-            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddSingleton(sp =>
             {
                 var builder = new DbContextOptionsBuilder<AuditContext>();
