@@ -1,6 +1,7 @@
 ﻿using EA.Audit.AuditService.Application.Features.Shared;
-using EA.Audit.Infrastructure.Application.Features.Audits.Commands;
-using EA.Audit.Infrastructure.Idempotency;
+using EA.Audit.Common.Application.Features.Audits.Commands;
+using EA.Audit.Common.Idempotency;
+using EA.Audit.Common.Infrastructure.Functional;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using Moq;
@@ -17,13 +18,13 @@ namespace EA.Audit.AuditServiceTests.Application
     {
         private readonly Mock<IRequestManager> _requestManager;
         private readonly Mock<IMediator> _mediator;
-        private readonly Mock<ILogger<IdentifiedCommandHandler<CreateAuditCommand, long>>> _loggerMock;
+        private readonly Mock<ILogger<IdentifiedCommandHandler<PublishAuditCommand, Result<string>>>> _loggerMock;
 
         public IdentifiedCommandHandlerTest()
         {
             _requestManager = new Mock<IRequestManager>();
             _mediator = new Mock<IMediator>();
-            _loggerMock = new Mock<ILogger<IdentifiedCommandHandler<CreateAuditCommand, long>>>();
+            _loggerMock = new Mock<ILogger<IdentifiedCommandHandler<PublishAuditCommand, Result<string>>>>();
         }
 
         [Test]
@@ -31,22 +32,22 @@ namespace EA.Audit.AuditServiceTests.Application
         {
             // Arrange
             var fakeGuid = Guid.NewGuid();
-            var fakeAuditCmd = new IdentifiedCommand<CreateAuditCommand, long>(FakeAuditRequest(), fakeGuid);
+            var fakeAuditCmd = new IdentifiedCommand<PublishAuditCommand, Result<string>>(FakeAuditRequest(), fakeGuid);
 
             _requestManager.Setup(x => x.ExistAsync(It.IsAny<Guid>()))
                .Returns(Task.FromResult(false));
 
-            _mediator.Setup(x => x.Send(It.IsAny<IRequest<long>>(), default(CancellationToken)))
-               .Returns(Task.FromResult(10L));
+            _mediator.Setup(x => x.Send(It.IsAny<IRequest<Result<string>>>(), default(CancellationToken)))
+               .Returns(Task.FromResult(Result.Ok("")));
 
             //Act
-            var handler = new IdentifiedCommandHandler<CreateAuditCommand, long>(_mediator.Object, _requestManager.Object, _loggerMock.Object);
+            var handler = new IdentifiedCommandHandler<PublishAuditCommand, Result<string>>(_mediator.Object, _requestManager.Object, _loggerMock.Object);
             var cltToken = new CancellationToken();
             var result = await handler.Handle(fakeAuditCmd, cltToken);
 
             //Assert
-            Assert.True(result == 10);
-            _mediator.Verify(x => x.Send(It.IsAny<IRequest<long>>(), default(CancellationToken)), Times.Once());
+            Assert.True(result.IsSuccess);
+            _mediator.Verify(x => x.Send(It.IsAny<IRequest<Result<string>>>(), default(CancellationToken)), Times.Once());
         }
 
         [Test]
@@ -54,34 +55,33 @@ namespace EA.Audit.AuditServiceTests.Application
         {
             // Arrange
             var fakeGuid = Guid.NewGuid();
-            var fakeAuditCmd = new IdentifiedCommand<CreateAuditCommand, long>(FakeAuditRequest(), fakeGuid);
+            var fakeAuditCmd = new IdentifiedCommand<PublishAuditCommand, Result<string>>(FakeAuditRequest(), fakeGuid);
 
             _requestManager.Setup(x => x.ExistAsync(It.IsAny<Guid>()))
                .Returns(Task.FromResult(true));
 
-            _mediator.Setup(x => x.Send(It.IsAny<IRequest<bool>>(), default(CancellationToken)))
-               .Returns(Task.FromResult(true));
+            _mediator.Setup(x => x.Send(It.IsAny<IRequest<Result<string>>>(), default(CancellationToken)))
+               .Returns(Task.FromResult(Result.Ok("")));
 
             //Act
-            var handler = new IdentifiedCommandHandler<CreateAuditCommand, long>(_mediator.Object, _requestManager.Object, _loggerMock.Object);
+            var handler = new PublishAuditIdentifiedCommandHandler(_mediator.Object, _requestManager.Object, _loggerMock.Object);
             var cltToken = new CancellationToken();
             var result = await handler.Handle(fakeAuditCmd, cltToken);
 
             //Assert
-            Assert.False(result == -1);
+            Assert.AreEqual("Duplicate Request for Create Audit",result.Error);
             _mediator.Verify(x => x.Send(It.IsAny<IRequest<bool>>(), default(CancellationToken)), Times.Never());
         }
 
-        private CreateAuditCommand FakeAuditRequest(Dictionary<string, object> args = null)
+        private PublishAuditCommand FakeAuditRequest(Dictionary<string, object> args = null)
         {
-            return new CreateAuditCommand(
+            return new PublishAuditCommand(
                 subjectId: args != null && args.ContainsKey("subjectId") ? (int)args["subjectId"] : 0,
                 subject: args != null && args.ContainsKey("subject") ? (string)args["subject"] : null,
                 actorId: args != null && args.ContainsKey("actorId") ? (int)args["actorId"] : 0,
                 actor: args != null && args.ContainsKey("actor") ? (string)args["actor"] : null,
                 description: args != null && args.ContainsKey("description") ? (string)args["description"] : null,
-                properties: args != null && args.ContainsKey("properties") ? (string)args["properties"] : null,
-                clientId: args != null && args.ContainsKey("clientId") ? (string)args["clientId"] : null);
+                properties: args != null && args.ContainsKey("properties") ? (string)args["properties"] : null);
 
         }
     }

@@ -1,4 +1,4 @@
-namespace EA.Audit.Infrastructure.Model
+namespace EA.Audit.Common.Model
 {
     public class PaginationFilter
     {

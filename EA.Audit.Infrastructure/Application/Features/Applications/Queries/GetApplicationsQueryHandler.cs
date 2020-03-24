@@ -1,15 +1,16 @@
-﻿using EA.Audit.AuditService.Application.Features.Shared;
-using AutoMapper;
+﻿using AutoMapper;
 using MediatR;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Application.Extensions;
-using EA.Audit.Infrastructure.Model;
+using EA.Audit.Common.Data;
+using EA.Audit.Common.Infrastructure;
+using EA.Audit.Common.Application.Features.Shared;
+using EA.Audit.Common.Infrastructure.Extensions;
+using EA.Audit.Common.Infrastructure.Functional;
 
-namespace EA.Audit.Infrastructure.Application.Queries
+namespace EA.Audit.Common.Application.Queries
 {
-    public class GetAuditApplicationsQuery : IRequest<PagedResponse<ApplicationDto>>
+    public class GetAuditApplicationsQuery : IRequest<Result<PagedResponse<ApplicationDto>>>
     {
         public GetAuditApplicationsQuery()
         {
@@ -25,7 +26,7 @@ namespace EA.Audit.Infrastructure.Application.Queries
         public int PageSize { get; set; }
     }
 
-    public class GetAuditApplicationQueryHandler : RequestHandler<GetAuditApplicationsQuery, PagedResponse<ApplicationDto>>
+    public class GetAuditApplicationQueryHandler : RequestHandler<GetAuditApplicationsQuery, Result<PagedResponse<ApplicationDto>>>
     {
         private readonly AuditContext _dbContext;
         private readonly IMapper _mapper;
@@ -40,35 +41,23 @@ namespace EA.Audit.Infrastructure.Application.Queries
             _logger = logger;
         }
 
-        protected override PagedResponse<ApplicationDto> Handle(GetAuditApplicationsQuery request)
-        {
-            int total = 0;
-            if (request == null)
-            {
-                var response = _mapper.ProjectTo<ApplicationDto>(_dbContext.AuditApplications).OrderBy(a => a.Id).ToList();
-                total = _dbContext.AuditApplications.Count();
-                return new PagedResponse<ApplicationDto>(response, total);
-            }
-
+        protected override Result<PagedResponse<ApplicationDto>> Handle(GetAuditApplicationsQuery request)
+        {  
             _logger.LogInformation(
                         "----- Handling query: {RequestName} - ({@Request})",
                         request.GetGenericTypeName(),
                         request);
 
-            var pagination = _mapper.Map<PaginationFilter>(request);
+            var pagination = _mapper.Map<PaginationDetails>(request).WithTotal(_dbContext.AuditApplications.Count())
+                                                                    .WithApiRoute(ApiRoutes.AuditApplications.GetAll);
 
-            var skip = (request.PageNumber) * request.PageSize;
-            var query = _mapper.ProjectTo<ApplicationDto>(_dbContext.AuditApplications).OrderBy(a => a.Id)
-                .Skip(skip).Take(request.PageSize).ToSql();
+            var auditApps = _mapper.ProjectTo<ApplicationDto>(_dbContext.AuditApplications.OrderBy(a => a.Id))
+                .Skip(pagination.PreviousPageNumber * pagination.PageSize)
+                .Take(request.PageSize).ToList();
 
-            var audits = _mapper.ProjectTo<ApplicationDto>(_dbContext.AuditApplications).OrderBy(a => a.Id)
-                .Skip(skip).Take(request.PageSize).ToList();
+            var paginationResponse = PagedResponse<ApplicationDto>.CreatePaginatedResponse(_uriService, pagination, auditApps);
 
-            total = _dbContext.AuditApplications.Count();
-            var paginationResponse = PaginationHelpers.CreatePaginatedResponse(_uriService, pagination, audits, total);
-
-            return paginationResponse;
-
+            return Result.Ok(paginationResponse);
         }
     }
 }

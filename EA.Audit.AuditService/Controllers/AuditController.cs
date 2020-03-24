@@ -5,14 +5,15 @@ using System.Threading.Tasks;
 using System;
 using EA.Audit.AuditService.Application.Features.Shared;
 using Microsoft.AspNetCore.Authorization;
-using EA.Audit.Infrastructure.Application.Extensions;
-using EA.Audit.Infrastructure;
-using EA.Audit.Infrastructure.Application.Features.Audits.Queries;
-using EA.Audit.Infrastructure.Application.Features.Audits.Commands;
+using EA.Audit.Common.Infrastructure.Extensions;
+using EA.Audit.Common.Application.Features.Audits.Queries;
+using EA.Audit.Common.Application.Features.Audits.Commands;
 using StackExchange.Redis;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
 using AutoMapper;
+using EA.Audit.Common.Infrastructure;
+using EA.Audit.Common.Infrastructure.Functional;
 
 namespace EA.Audit.AuditService.Controllers
 {
@@ -22,34 +23,34 @@ namespace EA.Audit.AuditService.Controllers
     { 
         private readonly ILogger<AuditController> _logger;
         private readonly IMediator _mediator;
-        private readonly IConnectionMultiplexer _connectionMultiplexer;
-        private readonly HttpContext _httpContext;
 
 
-        public AuditController(ILogger<AuditController> logger, IMediator mediator,
-            IConnectionMultiplexer connectionMultiplexer,
-            IHttpContextAccessor httpContentAccessor)
+        public AuditController(ILogger<AuditController> logger, IMediator mediator)
         {
             _logger = logger;
             _mediator = mediator;
-            _connectionMultiplexer = connectionMultiplexer;
-            _httpContext = httpContentAccessor.HttpContext;
         }
 
         [HttpGet(ApiRoutes.Audits.GetAll)]
         /*[Authorize("audit-api/read_audits")]*/
-        public async Task<ActionResult> GetAuditsAsync([FromQuery]GetAuditsQuery request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAuditsAsync([FromQuery]GetAuditsQuery request)
         {
-            var audits = await _mediator.Send(request).ConfigureAwait(false);
-            return Ok(audits);
+            var result = await _mediator.Send(request).ConfigureAwait(false);
+            return result.OnBoth(r => r.IsSuccess ? (IActionResult)Ok(r.Value) : NotFound(r.Error));
         }
 
         [HttpGet(ApiRoutes.Audits.Get)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         /*[Authorize("audit-api/read_audits")]*/
-        public async Task<ActionResult> GetAuditAsync(int id)
+        public async Task<IActionResult> GetAuditAsync(int id)
         { 
-            var audit = await _mediator.Send(new GetAuditDetailsQuery() { Id = id }).ConfigureAwait(false);
-            return Ok(audit);
+            var result = await _mediator.Send(new GetAuditDetailsQuery() { Id = id }).ConfigureAwait(false);
+            return result.OnBoth(r => r.IsSuccess ? (IActionResult)Ok(r.Value) : NotFound(r.Error));
         }
 
 
@@ -58,47 +59,34 @@ namespace EA.Audit.AuditService.Controllers
          * ********************************************************************/
         [HttpPost(ApiRoutes.Audits.Create)]
         /*[Authorize("audit-api/create_audit")]*/
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateAuditAsync([FromBody]PublishAuditCommand command, [FromHeader(Name = "x-requestid")] string requestId)
         {
-            long commandResult = -1;
 
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
-                var requestCreateAudit = new IdentifiedCommand<PublishAuditCommand, long>(command, guid);
+                var requestCreateAudit = new IdentifiedCommand<PublishAuditCommand, Result<string>>(command, guid);
 
                 _logger.LogInformation(
                     "----- Sending command: {CommandName} - ({@Command})",
                     requestCreateAudit.GetGenericTypeName(),
                     requestCreateAudit);
 
-                commandResult = await _mediator.Send(requestCreateAudit);
+                var commandResult = await _mediator.Send(requestCreateAudit);
+
+                if (commandResult.IsFailure)
+                {
+                    return BadRequest();
+                }
+            }
+            else
+            {
+                return BadRequest("x-requestid Header is missing");
             }
 
-            if (commandResult == -1)
-            {
-                return BadRequest();
-            }
-
-            return Ok(commandResult);
-        }
-
-        [HttpGet(ApiRoutes.Audits.GetFromRedis)]
-        public ActionResult GetAuditsFromRedis()
-        {
-            var publisher = _connectionMultiplexer.GetSubscriber();
-            var channel = _connectionMultiplexer.GetSubscriber().Subscribe("Audit");
-            string result = "Empty";
-
-            channel.OnMessage(message =>
-            {
-                _logger.LogInformation("Message from Redis- {0}", message.Message.ToString());
-                result = message.Message.ToString();
-            });
-
-            _logger.LogInformation("Message from Redis- {0}", result);
-
-            return Ok(result);
-        }
+            return StatusCode(201);
+        }       
 
 
         [HttpGet(ApiRoutes.Audits.Search)]

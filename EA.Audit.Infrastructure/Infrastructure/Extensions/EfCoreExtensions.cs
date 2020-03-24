@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace EA.Audit.Infrastructure.Application.Extensions
+namespace EA.Audit.Common.Infrastructure.Extensions
 {
     public static class EfCoreExtensions
     {

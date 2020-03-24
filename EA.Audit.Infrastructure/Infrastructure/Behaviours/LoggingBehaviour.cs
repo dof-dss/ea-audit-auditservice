@@ -4,13 +4,13 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EA.Audit.Infrastructure.Auth
+namespace EA.Audit.Common.Infrastructure.Behaviours
 {
-    public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class LoggingBehaviour<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
     {
-        private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
+        private readonly ILogger<LoggingBehaviour<TRequest, TResponse>> _logger;
 
-        public LoggingBehavior(ILogger<LoggingBehavior<TRequest, TResponse>> logger)
+        public LoggingBehaviour(ILogger<LoggingBehaviour<TRequest, TResponse>> logger)
         {
             _logger = logger;
         }

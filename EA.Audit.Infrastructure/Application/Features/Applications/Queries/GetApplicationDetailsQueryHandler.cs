@@ -1,19 +1,24 @@
 ﻿using AutoMapper;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Application.Extensions;
+using EA.Audit.Common.Data;
+using EA.Audit.Common.Infrastructure.Extensions;
+using System.Threading.Tasks;
+using EA.Audit.Common.Infrastructure.Functional;
+using EA.Audit.Common.Infrastructure;
+using System.Threading;
 
-namespace EA.Audit.Infrastructure.Application.Queries
+namespace EA.Audit.Common.Application.Queries
 {
 
-    public class GetAuditApplicationDetailsQuery : IRequest<ApplicationDto>
+    public class GetAuditApplicationDetailsQuery : IRequest<Result<ApplicationDto>>
     {
         public long Id { get; set; }
     }
 
-    public class GetAuditLevelDetailsQueryHandler : RequestHandler<GetAuditApplicationDetailsQuery, ApplicationDto>
+    public class GetAuditLevelDetailsQueryHandler : IRequestHandler<GetAuditApplicationDetailsQuery, Result<ApplicationDto>>
     {
         private readonly AuditContext _dbContext;
         private readonly IMapper _mapper;
@@ -26,14 +31,19 @@ namespace EA.Audit.Infrastructure.Application.Queries
             _logger = logger;
         }
 
-        protected override ApplicationDto Handle(GetAuditApplicationDetailsQuery request)
+        public async Task<Result<ApplicationDto>> Handle(GetAuditApplicationDetailsQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
             "----- Handling query: {RequestName} - ({@Request})",
             request.GetGenericTypeName(),
             request);
 
-            return _mapper.Map<ApplicationDto>(_dbContext.AuditApplications.FirstOrDefault(a => a.Id == request.Id));
+            var result = await _dbContext.AuditApplications.SingleOrDefaultAsync(a => a.Id == request.Id);
+
+            return result.ToMaybe().ToResult(Constants.ErrorMessages.NoItemExists)
+              .OnBoth(i => i.IsSuccess
+                  ? Result.Ok(_mapper.Map<ApplicationDto>(i.Value))
+                  : Result.Fail<ApplicationDto>(i.Error));
         }
     }
 }

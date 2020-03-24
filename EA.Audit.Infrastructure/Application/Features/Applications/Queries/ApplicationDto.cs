@@ -1,7 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace EA.Audit.Infrastructure.Application.Queries
+namespace EA.Audit.Common.Application.Queries
 {
     public class ApplicationDto
     {

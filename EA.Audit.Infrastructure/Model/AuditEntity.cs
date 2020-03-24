@@ -1,8 +1,8 @@
-using EA.Audit.Infrastructure.Model.Admin;
+using EA.Audit.Common.Model.Admin;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EA.Audit.Infrastructure.Model
+namespace EA.Audit.Common.Model
 {
     public class AuditEntity : BaseEntity
     {

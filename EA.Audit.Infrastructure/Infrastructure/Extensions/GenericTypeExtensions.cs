@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Linq;
 
-namespace EA.Audit.Infrastructure.Application.Extensions
+namespace EA.Audit.Common.Infrastructure.Extensions
 {
     public static class GenericTypeExtensions
     {

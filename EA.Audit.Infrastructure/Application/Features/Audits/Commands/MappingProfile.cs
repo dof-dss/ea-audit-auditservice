@@ -1,9 +1,9 @@
 using AutoMapper;
-using EA.Audit.Infrastructure.Model;
-using EA.Audit.Infrastructure.Application.Commands;
-using EA.Audit.Infrastructure.Model.Admin;
+using EA.Audit.Common.Model;
+using EA.Audit.Common.Application.Commands;
+using EA.Audit.Common.Model.Admin;
 
-namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
+namespace EA.Audit.Common.Application.Features.Audits.Commands
 {
     public class MappingProfile : Profile
     {

@@ -1,5 +1,5 @@
 ﻿
-namespace EA.Audit.Infrastructure.Data
+namespace EA.Audit.Common.Data
 {
     public interface IAuditContextFactory
     {

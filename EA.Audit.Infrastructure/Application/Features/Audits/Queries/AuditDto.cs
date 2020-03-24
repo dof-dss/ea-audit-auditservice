@@ -1,8 +1,8 @@
-using EA.Audit.Infrastructure.Model.Admin;
+using EA.Audit.Common.Model.Admin;
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
+namespace EA.Audit.Common.Application.Features.Audits.Queries
 {
     public class AuditDto
     {

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using EA.Audit.Infrastructure.Application.Features.Audits.Commands;
+using EA.Audit.Common.Application.Features.Audits.Commands;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;

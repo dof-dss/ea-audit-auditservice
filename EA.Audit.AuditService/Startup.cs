@@ -8,7 +8,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using MediatR;
 using AutoMapper;
-using System.Reflection;
 using Steeltoe.CloudFoundry.Connector.MySql.EFCore;
 using System;
 using Microsoft.Extensions.Logging;
@@ -18,11 +17,12 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.AspNetCore.Authorization;
-using EA.Audit.Infrastructure.Idempotency;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Auth;
-using EA.Audit.Infrastructure;
+using EA.Audit.Common.Idempotency;
+using EA.Audit.Common.Data;
 using Steeltoe.CloudFoundry.Connector.Redis;
+using EA.Audit.Common.Infrastructure;
+using EA.Audit.Common.Infrastructure.Behaviours;
+using EA.Audit.Common.Infrastructure.Auth;
 
 namespace EA.Audit.AuditService
 {
@@ -42,7 +42,7 @@ namespace EA.Audit.AuditService
             services.AddSingleton(jwtSettings);
             services.AddHttpContextAccessor();
 
-            var assembly = AppDomain.CurrentDomain.Load("EA.Audit.Infrastructure");
+            var assembly = AppDomain.CurrentDomain.Load("EA.Audit.Common");
             services.AddAutoMapper(assembly);
             services.AddMediatR(assembly);
             services.AddControllers();            
@@ -54,18 +54,13 @@ namespace EA.Audit.AuditService
             services.AddMvc(opt =>
                 {
                     opt.Filters.Add(typeof(ValidatorActionFilter));
-                }).AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssemblyContaining<Startup>(); });
-            
-            services.AddSingleton<IUriService>(provider =>
-            {
-                var accessor = provider.GetRequiredService<IHttpContextAccessor>();
-                var request = accessor.HttpContext.Request;
-                var absoluteUri = string.Concat(request.Scheme, "://", request.Host.ToUriComponent(), "/");
-                return new UriService(absoluteUri);
-            });
+                }).AddFluentValidation(cfg => { cfg.RegisterValidatorsFromAssembly(assembly); });
+
+            services.AddSingleton<IUriService, UriService>();
 
             services.AddScoped<IRequestManager, RequestManager>();
-            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(LoggingBehaviour<,>));
+            services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehaviour<,>));
             services.AddTransient<IAuditContextFactory, AuditContextFactory>();
 
             services.AddRedisConnectionMultiplexer(Configuration);
@@ -74,7 +69,8 @@ namespace EA.Audit.AuditService
 
         private void ConfigureAuthentication(IServiceCollection services)
         {
-            string authdomain = "https://cognito-idp.eu-west-2.amazonaws.com/eu-west-2_QtgogH91v";
+            var authConfig = AuthConfig.FromConfiguration(Configuration);
+            var authDomain = authConfig.AuthDomain;
 
             services.AddAuthentication(x =>
             {
@@ -82,16 +78,16 @@ namespace EA.Audit.AuditService
                 x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
                     {
-                        options.Authority = authdomain;
+                        options.Authority = authDomain;
                         //options.Audience = "3inpv3ubfmag4k97cu5iqsesg8";
                         options.TokenValidationParameters = new TokenValidationParameters() { ValidateAudience = false };
                     });
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("audit-api/read_audits", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/read_audits", authdomain)));
-                options.AddPolicy("audit-api/create_audit", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/create_audit", authdomain)));
-                options.AddPolicy("audit-api/audit_admin", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/audit_admin", authdomain)));
+                options.AddPolicy("audit-api/read_audits", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/read_audits", authDomain)));
+                options.AddPolicy("audit-api/create_audit", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/create_audit", authDomain)));
+                options.AddPolicy("audit-api/audit_admin", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/audit_admin", authDomain)));
             });
 
             // register the scope authorization handler

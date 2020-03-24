@@ -3,13 +3,15 @@ using AutoMapper;
 using MediatR;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Application.Extensions;
-using EA.Audit.Infrastructure.Model;
+using EA.Audit.Common.Data;
+using EA.Audit.Common.Infrastructure.Extensions;
+using EA.Audit.Common.Infrastructure;
+using EA.Audit.Common.Application.Features.Shared;
+using EA.Audit.Common.Infrastructure.Functional;
 
-namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
+namespace EA.Audit.Common.Application.Features.Audits.Queries
 {
-    public class SearchAuditsQuery : IRequest<PagedResponse<AuditDto>>
+    public class SearchAuditsQuery : IRequest<Result<PagedResponse<AuditDto>>>
     {
         public SearchAuditsQuery()
         {
@@ -30,7 +32,7 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
         public string PropertiesContains { get; set; }
     }
 
-    public class SearchAuditsQueryHandler : RequestHandler<SearchAuditsQuery, PagedResponse<AuditDto>>
+    public class SearchAuditsQueryHandler : RequestHandler<SearchAuditsQuery, Result<PagedResponse<AuditDto>>>
     {
         private readonly AuditContext _dbContext;
         private readonly IMapper _mapper;
@@ -45,22 +47,14 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
             _logger = logger;
         }
 
-        protected override PagedResponse<AuditDto> Handle(SearchAuditsQuery request)
-        {
-            int total = 0;
-            if (request == null)
-            {
-                var response = _mapper.ProjectTo<AuditDto>(_dbContext.Audits).OrderBy(a => a.Id).ToList();
-                total = _dbContext.Audits.Count();
-                return new PagedResponse<AuditDto>(response, total);
-            }
-
+        protected override Result<PagedResponse<AuditDto>> Handle(SearchAuditsQuery request)
+        {  
             _logger.LogInformation(
                        "----- Handling query: {RequestName} - ({@Request})",
                        request.GetGenericTypeName(),
                        request);
 
-            var pagination = _mapper.Map<PaginationFilter>(request);
+            var pagination = _mapper.Map<PaginationDetails>(request).WithTotal(_dbContext.Audits.Count());
 
             var skip = (request.PageNumber) * request.PageSize;
 
@@ -68,13 +62,11 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
                 .Where(a => string.IsNullOrEmpty(request.DescriptionContains) || a.Description.Contains(request.DescriptionContains))
                 .Where(a => string.IsNullOrEmpty(request.PropertiesContains) || a.Properties.Contains(request.PropertiesContains))
                 .OrderBy(a => a.Id)
-                .Skip(skip).Take(request.PageSize).ToList();
+                .Skip(pagination.PreviousPageNumber * pagination.PageSize).ToList();
 
-            total = _dbContext.Audits.Count();
+            var paginationResponse = PagedResponse<AuditDto>.CreatePaginatedResponse(_uriService, pagination, audits);
 
-            var paginationResponse = PaginationHelpers.CreatePaginatedResponse(_uriService, pagination, audits, total);
-
-            return paginationResponse;
+            return Result.Ok(paginationResponse);
 
         }
     }

@@ -1,11 +1,11 @@
-using EA.Audit.AuditService.Application.Features.Shared;
+using EA.Audit.Common.Application.Features.Shared;
 using System;
 
-namespace EA.Audit.Infrastructure
+namespace EA.Audit.Common.Infrastructure
 {
     public interface IUriService
     {
-        Uri GetAuditUri(string postId);
-        Uri GetAllAuditsUri(PaginationQuery pagination = null);
+        Uri CreateNextPageUri(PaginationDetails paginationDetails);
+        Uri CreatePreviousPageUri(PaginationDetails paginationDetails);
     }
 }

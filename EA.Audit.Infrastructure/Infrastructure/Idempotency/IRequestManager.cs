@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
 
-namespace EA.Audit.Infrastructure.Idempotency
+namespace EA.Audit.Common.Idempotency
 {
     public interface IRequestManager
     {

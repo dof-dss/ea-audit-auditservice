@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 
-namespace EA.Audit.Infrastructure.Model.Admin
+namespace EA.Audit.Common.Model.Admin
 {
     public class AuditApplication : BaseEntity
     {

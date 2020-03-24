@@ -3,7 +3,7 @@ using Microsoft.IdentityModel.Tokens;
 using System;
 using System.Security.Cryptography;
 
-namespace EA.Audit.Infrastructure
+namespace EA.Audit.Common.Infrastructure
 {
     public class JwtSettings
     {

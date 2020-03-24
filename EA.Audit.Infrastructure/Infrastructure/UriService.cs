@@ -1,35 +1,33 @@
 using System;
-using EA.Audit.AuditService.Application.Features.Shared;
+using EA.Audit.Common.Application.Features.Shared;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.WebUtilities;
 
-namespace EA.Audit.Infrastructure
+namespace EA.Audit.Common.Infrastructure
 {
     public class UriService : IUriService
     {
         private readonly string _baseUri;
-        
-        public UriService(string baseUri)
+
+        public UriService(IHttpContextAccessor httpContextAccessor)
         {
-            _baseUri = baseUri;
-        }
-        
-        public Uri GetAuditUri(string postId)
-        {
-            return new Uri(_baseUri + ApiRoutes.Audits.Get.Replace("{Id}", postId));
+            _baseUri = string.Concat(httpContextAccessor.HttpContext.Request.Scheme, "://", httpContextAccessor.HttpContext.Request.Host.ToUriComponent(), "/");
         }
 
-        public Uri GetAllAuditsUri(PaginationQuery pagination = null)
+        public Uri CreateNextPageUri(PaginationDetails paginationDetails) =>
+            CreateUriFor(paginationDetails.ApiRoute, paginationDetails.NextPageNumber,
+                paginationDetails.PageSize);
+
+
+        public Uri CreatePreviousPageUri(PaginationDetails paginationDetails) =>
+            CreateUriFor(paginationDetails.ApiRoute, paginationDetails.PreviousPageNumber,
+                paginationDetails.PageSize);
+
+        private Uri CreateUriFor(string route, int pageNumber, int pageSize)
         {
-            var uri = new Uri(_baseUri);
+            var modifiedUri = QueryHelpers.AddQueryString(_baseUri + route, "pageNumber", pageNumber.ToString());
+            modifiedUri = QueryHelpers.AddQueryString(modifiedUri, "pageSize", pageSize.ToString());
 
-            if (pagination == null)
-            {
-                return uri;
-            }
-
-            var modifiedUri = QueryHelpers.AddQueryString(_baseUri + ApiRoutes.Audits.GetAll, "pageNumber", pagination.PageNumber.ToString());
-            modifiedUri = QueryHelpers.AddQueryString(modifiedUri, "pageSize", pagination.PageSize.ToString());
-            
             return new Uri(modifiedUri);
         }
     }

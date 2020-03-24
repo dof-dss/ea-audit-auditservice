@@ -1,6 +1,6 @@
-﻿using EA.Audit.Infrastructure.Application.Extensions;
-using EA.Audit.Infrastructure.Application.Features.Audits.Commands;
-using EA.Audit.Infrastructure.Idempotency;
+﻿using EA.Audit.Common.Infrastructure.Extensions;
+using EA.Audit.Common.Application.Features.Audits.Commands;
+using EA.Audit.Common.Idempotency;
 using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Threading;
@@ -45,7 +45,8 @@ namespace EA.Audit.AuditService.Application.Features.Shared
             var alreadyExists = await _requestManager.ExistAsync(message.Id).ConfigureAwait(false);
             if (alreadyExists)
             {
-                return CreateResultForDuplicateRequest();
+                var result = CreateResultForDuplicateRequest();
+                return result;
             }
             else
             {
@@ -57,7 +58,7 @@ namespace EA.Audit.AuditService.Application.Features.Shared
 
                     switch (command)
                     {
-                        case CreateAuditCommand createAuditCommand:                         
+                        case PublishAuditCommand publishAuditCommand:                         
                             break;                       
 
                         default:

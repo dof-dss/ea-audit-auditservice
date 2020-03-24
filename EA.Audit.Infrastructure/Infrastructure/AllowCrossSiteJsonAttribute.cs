@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Filters;
 
-namespace EA.Audit.Infrastructure
+namespace EA.Audit.Common.Infrastructure
 {
     public class AllowCrossSiteJsonAttribute : ActionFilterAttribute
     {

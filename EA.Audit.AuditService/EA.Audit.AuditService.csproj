@@ -37,6 +37,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="5.0.0" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\EA.Audit.Infrastructure\EA.Audit.Infrastructure.csproj" />
+    <ProjectReference Include="..\EA.Audit.Infrastructure\EA.Audit.Common.csproj" />
   </ItemGroup>
 </Project>

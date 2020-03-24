@@ -2,7 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Newtonsoft.Json;
 
-namespace EA.Audit.Infrastructure
+namespace EA.Audit.Common.Infrastructure
 {
     public class ValidatorActionFilter : IActionFilter
     {

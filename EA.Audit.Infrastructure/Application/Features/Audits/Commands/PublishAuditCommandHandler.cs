@@ -8,14 +8,16 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System.Linq;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Idempotency;
+using EA.Audit.Common.Data;
+using EA.Audit.Common.Idempotency;
 using StackExchange.Redis;
 using Newtonsoft.Json;
+using EA.Audit.Common.Infrastructure.Functional;
+using EA.Audit.Common.Infrastructure;
 
-namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
+namespace EA.Audit.Common.Application.Features.Audits.Commands
 {
-    public class PublishAuditCommand : IRequest<long>
+    public class PublishAuditCommand : IRequest<Result<string>>
     {
         public PublishAuditCommand()
         {
@@ -50,7 +52,7 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
             }
         }
     
-    public class PublishAuditCommandHandler : IRequestHandler<PublishAuditCommand, long>
+    public class PublishAuditCommandHandler : IRequestHandler<PublishAuditCommand, Result<string>>
     {
         private const string NoClientIdFound = "No ClientId on HttpContext";
         private const string NoApplicationFound = "No Application found for ClientId";
@@ -70,9 +72,9 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
             _logger = logger;
         }
 
-        public async Task<long> Handle(PublishAuditCommand command, CancellationToken cancellationToken)
+        public async Task<Result<string>> Handle(PublishAuditCommand command, CancellationToken cancellationToken)
         {
-            _logger.LogInformation("Entering Handle()");
+            _logger.LogDebug("Entering Handle()");
             var createCommand = _mapper.Map<CreateAuditCommand>(command);            
 
             //Temp for Testing without Auth
@@ -88,31 +90,30 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
                 throw new Exception(NoClientIdFound);
             }
 
-
             createCommand.ClientId = clientId;
             var publisher = _connectionMultiplexer.GetSubscriber();
             var result = await publisher.PublishAsync("AuditCommand", JsonConvert.SerializeObject(createCommand), CommandFlags.FireAndForget);
-            _logger.LogInformation("Publish Result {0}", result.ToString());
-            _logger.LogInformation("Publishing {0}", JsonConvert.SerializeObject(createCommand).ToString());
-            _logger.LogInformation("Exiting Handle()");
-            return 1;
+
+            _logger.LogDebug("Exiting Handle()");
+
+            return Result.Ok(Constants.SuccessMessages.AuditPublishSuccess);
         }
     }
 
 
-    public class PublishAuditIdentifiedCommandHandler : IdentifiedCommandHandler<PublishAuditCommand, long>
+    public class PublishAuditIdentifiedCommandHandler : IdentifiedCommandHandler<PublishAuditCommand, Result<string>>
     {
         public PublishAuditIdentifiedCommandHandler(
             IMediator mediator,
             IRequestManager requestManager,
-            ILogger<IdentifiedCommandHandler<PublishAuditCommand, long>> logger)
+            ILogger<IdentifiedCommandHandler<PublishAuditCommand, Result<string>>> logger)
             : base(mediator, requestManager, logger)
         {
         }
 
-        protected override long CreateResultForDuplicateRequest()
+        protected override Result<string> CreateResultForDuplicateRequest()
         {
-            return -1;                // Ignore duplicate requests for processing create audit.
+            return Result.Fail<string>(Constants.ErrorMessages.DuplicateRequestForAudit);
         }
     }
 }

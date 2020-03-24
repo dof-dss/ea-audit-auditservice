@@ -1,14 +1,16 @@
 ﻿using EA.Audit.AuditService.Application.Features.Shared;
-using EA.Audit.Infrastructure;
-using EA.Audit.Infrastructure.Application.Commands;
-using EA.Audit.Infrastructure.Application.Extensions;
-using EA.Audit.Infrastructure.Application.Queries;
+using EA.Audit.Common.Infrastructure;
+using EA.Audit.Common.Application.Commands;
+using EA.Audit.Common.Infrastructure.Extensions;
+using EA.Audit.Common.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
+using EA.Audit.Common.Infrastructure.Functional;
 
 namespace EA.Audit.AuditService.Controllers
 {
@@ -27,44 +29,54 @@ namespace EA.Audit.AuditService.Controllers
 
         [HttpGet(ApiRoutes.AuditApplications.GetAll)]
         /*[Authorize("audit-api/audit_admin")]*/
-        public async Task<ActionResult> GetAuditApplicationsAsync([FromQuery]GetAuditApplicationsQuery request)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAuditApplicationsAsync([FromQuery]GetAuditApplicationsQuery request)
         {
-            var audits = await _mediator.Send(request).ConfigureAwait(false);
-            return Ok(audits);
+            var result = await _mediator.Send(request).ConfigureAwait(false);
+            return result.OnBoth(r => r.IsSuccess ? (IActionResult)Ok(r.Value) : NotFound(r.Error));
         }
 
         [HttpGet(ApiRoutes.AuditApplications.Get)]
         /*[Authorize("audit-api/audit_admin")]*/
-        public async Task<ActionResult> GetAuditApplicationAsync(int id)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> GetAuditApplicationAsync(int id)
         {
-            var audit = await _mediator.Send(new GetAuditApplicationDetailsQuery() { Id = id }).ConfigureAwait(false);
-            return Ok(audit);
+            var result = await _mediator.Send(new GetAuditApplicationDetailsQuery() { Id = id }).ConfigureAwait(false);
+            return result.OnBoth(r => r.IsSuccess ? (IActionResult)Ok(r.Value) : NotFound(r.Error));
         }
 
         [HttpPost(ApiRoutes.AuditApplications.Create)]
         /*[Authorize("audit-api/audit_admin")]*/
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateAuditApplicationAsync([FromBody]CreateAuditApplicationCommand command, [FromHeader(Name = "x-requestid")] string requestId)
         {
-            long commandResult = -1;
-
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
             {
-                var requestCreateAuditApplication = new IdentifiedCommand<CreateAuditApplicationCommand, long>(command, guid);
+                var requestCreateAuditApplication = new IdentifiedCommand<CreateAuditApplicationCommand, Result<long>>(command, guid);
 
                 _logger.LogInformation(
                     "----- Sending command: {CommandName} - ({@Command})",
                     requestCreateAuditApplication.GetGenericTypeName(),
                     requestCreateAuditApplication);
 
-                commandResult = await _mediator.Send(requestCreateAuditApplication).ConfigureAwait(false);
-            }
+                var commandResult = await _mediator.Send(requestCreateAuditApplication).ConfigureAwait(false);
 
-            if (commandResult == -1)
+                if (commandResult.IsFailure)
+                {
+                    return BadRequest();
+                }
+            }
+            else
             {
-                return BadRequest();
+                return BadRequest("x-requestid Header is missing");
             }
 
-            return Ok(commandResult);
+            return StatusCode(201);
         }
 
     }

@@ -1,4 +1,4 @@
-namespace EA.Audit.Infrastructure
+namespace EA.Audit.Common.Infrastructure
 {
     public static class ApiRoutes
     {

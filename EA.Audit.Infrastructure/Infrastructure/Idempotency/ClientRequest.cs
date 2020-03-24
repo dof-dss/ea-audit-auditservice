@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace EA.Audit.Infrastructure.Idempotency
+namespace EA.Audit.Common.Idempotency
 {
     public class ClientRequest
     {

@@ -1,4 +1,4 @@
-namespace EA.Audit.AuditService.Application.Features.Shared
+namespace EA.Audit.Common.Application.Features.Shared
 { 
     public class PaginationQuery
     {

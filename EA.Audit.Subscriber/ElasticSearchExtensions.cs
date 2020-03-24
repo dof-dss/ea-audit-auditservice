@@ -1,4 +1,4 @@
-﻿using EA.Audit.Infrastructure.Model;
+﻿using EA.Audit.Common.Model;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Nest;

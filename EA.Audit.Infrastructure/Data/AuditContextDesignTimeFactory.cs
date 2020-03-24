@@ -6,7 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace EA.Audit.Infrastructure.Data
+namespace EA.Audit.Common.Data
 {
     public class AuditContextDesignTimeFactory : IDesignTimeDbContextFactory<AuditContext>
     {

@@ -1,19 +1,22 @@
 using AutoMapper;
-using System.Linq;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Application.Extensions;
+using EA.Audit.Common.Data;
+using System.Threading.Tasks;
+using EA.Audit.Common.Infrastructure.Functional;
+using EA.Audit.Common.Infrastructure;
+using System.Threading;
+using EA.Audit.Common.Infrastructure.Extensions;
 
-namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
+namespace EA.Audit.Common.Application.Features.Audits.Queries
 {
-    public class GetAuditDetailsQuery : IRequest<AuditDto>
+    public class GetAuditDetailsQuery : IRequest<Result<AuditDto>>
     { 
         public long Id { get; set; }
     }
     
-    public class GetAuditDetailsQueryHandler : RequestHandler<GetAuditDetailsQuery, AuditDto>
+    public class GetAuditDetailsQueryHandler : IRequestHandler<GetAuditDetailsQuery, Result<AuditDto>>
     {
         private readonly AuditContext _dbContext;
         private readonly IMapper _mapper;
@@ -24,16 +27,22 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Queries
             _dbContext = dbContextFactory.AuditContext;
             _mapper = mapper;
             _logger = logger;
-        }    
+        }
 
-        protected override AuditDto Handle(GetAuditDetailsQuery request)
+
+        public async Task<Result<AuditDto>> Handle(GetAuditDetailsQuery request, CancellationToken cancellationToken)
         {
             _logger.LogInformation(
             "----- Handling query: {RequestName} - ({@Request})",
             request.GetGenericTypeName(),
             request);
 
-            return _mapper.Map<AuditDto>(_dbContext.Audits.Include(a => a.AuditApplication).FirstOrDefault(a => a.Id == request.Id));
+            var result = await _dbContext.Audits.Include(a => a.AuditApplication).SingleOrDefaultAsync(a => a.Id == request.Id);
+
+            return result.ToMaybe().ToResult(Constants.ErrorMessages.NoItemExists)
+              .OnBoth(i => i.IsSuccess
+                  ? Result.Ok(_mapper.Map<AuditDto>(i.Value))
+                  : Result.Fail<AuditDto>(i.Error));
         }
     }
 }

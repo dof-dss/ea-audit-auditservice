@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using System;
 
-namespace EA.Audit.Infrastructure.Auth
+namespace EA.Audit.Common.Infrastructure.Auth
 {
     public class HasScopeRequirement : IAuthorizationRequirement
     {

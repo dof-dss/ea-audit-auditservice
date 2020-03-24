@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace EA.Audit.Infrastructure.Auth
+namespace EA.Audit.Common.Infrastructure.Auth
 {
     public class HasScopeHandler : AuthorizationHandler<HasScopeRequirement>
     {

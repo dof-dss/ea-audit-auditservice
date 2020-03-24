@@ -3,36 +3,44 @@ using System.Data;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using EA.Audit.Infrastructure.Idempotency;
-using EA.Audit.Infrastructure.Model;
-using EA.Audit.Infrastructure.Model.Admin;
+using EA.Audit.Common.Idempotency;
+using EA.Audit.Common.Model;
+using EA.Audit.Common.Model.Admin;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 
-namespace EA.Audit.Infrastructure.Data
+namespace EA.Audit.Common.Data
 {
 
     public class AuditContext : DbContext
     {
-        private readonly bool _isAdmin;
-
+        public string _clientId;
         private IDbContextTransaction _currentTransaction;
         public DbSet<AuditEntity> Audits { get; set; }
         public DbSet<AuditApplication> AuditApplications { get; set; }
         public DbSet<ClientRequest> ClientRequests { get; set; }
 
-        public string ClientId { get; set; }
+        public string ClientId {    
+                                    get { 
+                                            return IsAdmin ? "Admin" : _clientId; 
+                                        }
+                                    set { 
+                                            _clientId = value; 
+                                        } 
+                                }
+
+        public bool IsAdmin { get; }
 
         public AuditContext(DbContextOptions options, string clientId)
             : base(options)
         {
-            ClientId = clientId;
+            _clientId = clientId;
         }
 
         public AuditContext(DbContextOptions options, bool IsAdmin)
            : base(options)
         {
-            _isAdmin = IsAdmin;
+            this.IsAdmin = IsAdmin;
         }
 
         public AuditContext(DbContextOptions<AuditContext> options)
@@ -43,9 +51,9 @@ namespace EA.Audit.Infrastructure.Data
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<AuditEntity>().HasQueryFilter(b => _isAdmin || EF.Property<string>(b, nameof(ClientId)) == ClientId).HasOne(a => a.AuditApplication);
+            modelBuilder.Entity<AuditEntity>().HasQueryFilter(b => IsAdmin || EF.Property<string>(b, nameof(ClientId)) == ClientId).HasOne(a => a.AuditApplication);
 
-            modelBuilder.Entity<AuditApplication>().HasQueryFilter(b => _isAdmin || EF.Property<string>(b, nameof(ClientId)) == ClientId);
+            modelBuilder.Entity<AuditApplication>().HasQueryFilter(b => IsAdmin || EF.Property<string>(b, nameof(ClientId)) == ClientId);
  
             base.OnModelCreating(modelBuilder);
         }

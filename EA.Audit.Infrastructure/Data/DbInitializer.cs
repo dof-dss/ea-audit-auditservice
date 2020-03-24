@@ -1,10 +1,10 @@
 using System;
 using System.Linq;
-using EA.Audit.Infrastructure.Model;
-using EA.Audit.Infrastructure.Model.Admin;
+using EA.Audit.Common.Model;
+using EA.Audit.Common.Model.Admin;
 using Microsoft.EntityFrameworkCore;
 
-namespace EA.Audit.Infrastructure.Data
+namespace EA.Audit.Common.Data
 {
     public static class DbInitializer
     {

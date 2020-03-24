@@ -1,8 +1,10 @@
 ﻿using AutoMapper;
 using EA.Audit.AuditService.Application.Features.Shared;
-using EA.Audit.Infrastructure.Data;
-using EA.Audit.Infrastructure.Idempotency;
-using EA.Audit.Infrastructure.Model;
+using EA.Audit.Common.Data;
+using EA.Audit.Common.Idempotency;
+using EA.Audit.Common.Infrastructure;
+using EA.Audit.Common.Infrastructure.Functional;
+using EA.Audit.Common.Model;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.Logging;
@@ -11,9 +13,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
+namespace EA.Audit.Common.Application.Features.Audits.Commands
 {
-    public class CreateAuditCommand : IRequest<long>
+    public class CreateAuditCommand : IRequest<Result<long>>
     {
         public CreateAuditCommand()
         {
@@ -51,9 +53,9 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
         }
     }
 
-    public class CreateAuditCommandHandler : IRequestHandler<CreateAuditCommand, long>
+    public class CreateAuditCommandHandler : IRequestHandler<CreateAuditCommand, Result<long>>
     {
-        private const string NoApplicationFound = "No Application found for ClientId";
+        
         private readonly AuditContext _dbContext;
         private readonly IMapper _mapper;
         private readonly ILogger<CreateAuditCommandHandler> _logger;
@@ -65,7 +67,7 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
             _logger = logger;
         }
 
-        public async Task<long> Handle(CreateAuditCommand command, CancellationToken cancellationToken)
+        public async Task<Result<long>> Handle(CreateAuditCommand command, CancellationToken cancellationToken)
         {
             var audit = _mapper.Map<AuditEntity>(command);
 
@@ -74,7 +76,7 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
             var auditApplication = _dbContext.AuditApplications.FirstOrDefault(a => a.ClientId == command.ClientId);
             if (auditApplication == null)
             {
-                throw new Exception(NoApplicationFound);
+                return Result.Fail<long>(Constants.ErrorMessages.NoApplicationFound);
             }
             
             audit.AuditApplicationId = auditApplication.Id;
@@ -83,24 +85,24 @@ namespace EA.Audit.Infrastructure.Application.Features.Audits.Commands
 
             _logger.LogInformation("Audit persisted to database with Id -{0}", audit.Id);
 
-            return audit.Id;
+            return Result.Ok(audit.Id);
         }
     }
 
 
-    public class CreateAuditIdentifiedCommandHandler : IdentifiedCommandHandler<CreateAuditCommand, long>
+    public class CreateAuditIdentifiedCommandHandler : IdentifiedCommandHandler<CreateAuditCommand, Result<long>>
     {
         public CreateAuditIdentifiedCommandHandler(
             IMediator mediator,
             IRequestManager requestManager,
-            ILogger<IdentifiedCommandHandler<CreateAuditCommand, long>> logger)
+            ILogger<IdentifiedCommandHandler<CreateAuditCommand, Result<long>>> logger)
             : base(mediator, requestManager, logger)
         {
         }
 
-        protected override long CreateResultForDuplicateRequest()
+        protected override Result<long> CreateResultForDuplicateRequest()
         {
-            return -1;                // Ignore duplicate requests for processing create audit.
+            return Result.Fail<long>(Constants.ErrorMessages.DuplicateRequestForAudit);                // Ignore duplicate requests for processing create audit.
         }
     }
 }

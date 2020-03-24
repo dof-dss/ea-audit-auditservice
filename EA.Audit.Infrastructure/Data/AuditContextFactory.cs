@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Linq;
 
-namespace EA.Audit.Infrastructure.Data
+namespace EA.Audit.Common.Data
 {
     public class AuditContextFactory : IAuditContextFactory
     {

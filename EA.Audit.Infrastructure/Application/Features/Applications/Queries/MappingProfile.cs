@@ -1,15 +1,15 @@
 ﻿using AutoMapper;
-using EA.Audit.Infrastructure.Model.Admin;
-using EA.Audit.Infrastructure.Model;
+using EA.Audit.Common.Model.Admin;
+using EA.Audit.Common.Application.Features.Shared;
 
-namespace EA.Audit.Infrastructure.Application.Queries
+namespace EA.Audit.Common.Application.Queries
 {
     public class MappingProfile : Profile
     {
         public MappingProfile()
         {
             CreateMap<AuditApplication, ApplicationDto>();
-            CreateMap<GetAuditApplicationsQuery, PaginationFilter>();
+            CreateMap<GetAuditApplicationsQuery, PaginationDetails>();
         }
     }
 }
