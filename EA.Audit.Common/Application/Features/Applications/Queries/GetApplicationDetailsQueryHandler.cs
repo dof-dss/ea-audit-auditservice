@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using EA.Audit.Common.Infrastructure.Functional;
 using EA.Audit.Common.Infrastructure;
 using System.Threading;
+using FluentValidation;
 
 namespace EA.Audit.Common.Application.Queries
 {
@@ -16,6 +17,14 @@ namespace EA.Audit.Common.Application.Queries
     public class GetAuditApplicationDetailsQuery : IRequest<Result<ApplicationDto>>
     {
         public long Id { get; set; }
+    }
+
+    public class GetAuditApplicationDetailsQueryValidator : AbstractValidator<GetAuditApplicationDetailsQuery>
+    {
+        public GetAuditApplicationDetailsQueryValidator()
+        {
+            RuleFor(m => m.Id).GreaterThan(0);
+        }
     }
 
     public class GetAuditLevelDetailsQueryHandler : IRequestHandler<GetAuditApplicationDetailsQuery, Result<ApplicationDto>>

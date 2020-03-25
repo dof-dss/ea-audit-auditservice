@@ -57,7 +57,7 @@ namespace EA.Audit.AuditService.Tests.Functional
 
                 var options = scopedServices.GetRequiredService<DbContextOptions<AuditContext>>();
                 var httpContextAccessorMock = new Mock<IHttpContextAccessor>();
-                httpContextAccessorMock.Setup(x => x.HttpContext.Request.Headers[Constants.XRequest.XRequestId])
+                httpContextAccessorMock.Setup(x => x.HttpContext.Request.Headers[Constants.XRequest.XRequestIdHeaderName])
                     .Returns("b0ed668d-7ef2-4a23-a333-94ad278f45d7");
 
                 var db = new AuditContextFactory(httpContextAccessorMock.Object, options);

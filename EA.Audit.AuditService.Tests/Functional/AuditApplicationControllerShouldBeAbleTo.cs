@@ -22,7 +22,7 @@ namespace EA.Audit.AuditService.Tests.Functional
         public AuditApplicationControllerShouldBeAbleTo()
         {
             _client = new CustomWebApplicationFactory<Startup>().CreateClient();
-            _client.DefaultRequestHeaders.Add(Constants.XRequest.XRequestId, "b0ed668d-7ef2-4a23-a333-94ad278f45d7");
+            _client.DefaultRequestHeaders.Add(Constants.XRequest.XRequestIdHeaderName, "b0ed668d-7ef2-4a23-a333-94ad278f45d7");
         }
 
         [Test]

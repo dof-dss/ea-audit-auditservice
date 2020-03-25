@@ -8,10 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 using EA.Audit.Common.Infrastructure.Extensions;
 using EA.Audit.Common.Application.Features.Audits.Queries;
 using EA.Audit.Common.Application.Features.Audits.Commands;
-using StackExchange.Redis;
 using Microsoft.AspNetCore.Http;
-using System.Linq;
-using AutoMapper;
 using EA.Audit.Common.Infrastructure;
 using EA.Audit.Common.Infrastructure.Functional;
 
@@ -32,7 +29,7 @@ namespace EA.Audit.AuditService.Controllers
         }
 
         [HttpGet(ApiRoutes.Audits.GetAll)]
-        /*[Authorize("audit-api/read_audits")]*/
+        [Authorize(Constants.Auth.ReadAudits)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -46,7 +43,7 @@ namespace EA.Audit.AuditService.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        /*[Authorize("audit-api/read_audits")]*/
+        [Authorize(Constants.Auth.ReadAudits)]
         public async Task<IActionResult> GetAuditAsync(int id)
         { 
             var result = await _mediator.Send(new GetAuditDetailsQuery() { Id = id }).ConfigureAwait(false);
@@ -58,10 +55,10 @@ namespace EA.Audit.AuditService.Controllers
          * CONSIDER PULLING INTO SEPARATE API FOR SCALING INDEPENDENT OF READ
          * ********************************************************************/
         [HttpPost(ApiRoutes.Audits.Create)]
-        /*[Authorize("audit-api/create_audit")]*/
+        [Authorize(Constants.Auth.CreateAudits)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateAuditAsync([FromBody]PublishAuditCommand command, [FromHeader(Name = "x-requestid")] string requestId)
+        public async Task<IActionResult> CreateAuditAsync([FromBody]PublishAuditCommand command, [FromHeader(Name = Constants.XRequest.XRequestIdHeaderName)] string requestId)
         {
 
             if (Guid.TryParse(requestId, out Guid guid) && guid != Guid.Empty)
@@ -73,7 +70,7 @@ namespace EA.Audit.AuditService.Controllers
                     requestCreateAudit.GetGenericTypeName(),
                     requestCreateAudit);
 
-                var commandResult = await _mediator.Send(requestCreateAudit);
+                var commandResult = await _mediator.Send(requestCreateAudit).ConfigureAwait(false);
 
                 if (commandResult.IsFailure)
                 {
@@ -82,7 +79,7 @@ namespace EA.Audit.AuditService.Controllers
             }
             else
             {
-                return BadRequest("x-requestid Header is missing");
+                return BadRequest(Constants.ErrorMessages.XRequestIdIsMissing);
             }
 
             return StatusCode(201);
@@ -90,7 +87,7 @@ namespace EA.Audit.AuditService.Controllers
 
 
         [HttpGet(ApiRoutes.Audits.Search)]
-        /*[Authorize("audit-api/read_audits")]*/
+        [Authorize(Constants.Auth.ReadAudits)]
         public async Task<ActionResult> SearchAuditsAsync([FromQuery]SearchAuditsQuery request)
         {
             var audits = await _mediator.Send(request).ConfigureAwait(false);

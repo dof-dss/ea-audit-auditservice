@@ -23,6 +23,7 @@ using Steeltoe.CloudFoundry.Connector.Redis;
 using EA.Audit.Common.Infrastructure;
 using EA.Audit.Common.Infrastructure.Behaviours;
 using EA.Audit.Common.Infrastructure.Auth;
+using Microsoft.AspNetCore.Mvc;
 
 namespace EA.Audit.AuditService
 {
@@ -49,7 +50,12 @@ namespace EA.Audit.AuditService
 
             ConfigureAuthentication(services);
             ConfigureAuditContext(services);
-            ConfigureSwagger(services);        
+            ConfigureSwagger(services);
+
+            services.Configure<ApiBehaviorOptions>(options =>
+            {
+                options.SuppressModelStateInvalidFilter = true;
+            });
 
             services.AddMvc(opt =>
                 {
@@ -85,9 +91,9 @@ namespace EA.Audit.AuditService
 
             services.AddAuthorization(options =>
             {
-                options.AddPolicy("audit-api/read_audits", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/read_audits", authDomain)));
-                options.AddPolicy("audit-api/create_audit", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/create_audit", authDomain)));
-                options.AddPolicy("audit-api/audit_admin", policy => policy.Requirements.Add(new HasScopeRequirement("audit-api/audit_admin", authDomain)));
+                options.AddPolicy(Constants.Auth.ReadAudits, policy => policy.Requirements.Add(new HasScopeRequirement(Constants.Auth.ReadAudits, authDomain)));
+                options.AddPolicy(Constants.Auth.CreateAudits, policy => policy.Requirements.Add(new HasScopeRequirement(Constants.Auth.CreateAudits, authDomain)));
+                options.AddPolicy(Constants.Auth.Admin, policy => policy.Requirements.Add(new HasScopeRequirement(Constants.Auth.Admin, authDomain)));
             });
 
             // register the scope authorization handler

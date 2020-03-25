@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using EA.Audit.Common.Application.Features.Audits.Commands;
+using EA.Audit.Common.Infrastructure;
 using MediatR;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -26,7 +27,7 @@ namespace EA.Audit.Subscriber
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             var sub = _connectionMultiplexer.GetSubscriber();
-            await sub.SubscribeAsync("AuditCommand", async (channel, value) =>
+            await sub.SubscribeAsync(Constants.Redis.AuditChannel, async (channel, value) =>
             {
                 _logger.LogInformation($"{DateTime.Now:yyyyMMdd HH:mm:ss}<{value.ToString()}>.");
 

@@ -1,6 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace EA.Audit.Common.Infrastructure
 {
@@ -10,15 +13,9 @@ namespace EA.Audit.Common.Infrastructure
         {
             if (!filterContext.ModelState.IsValid)
             {
-                if (filterContext.HttpContext.Request.Method == "GET")
-                {
-                    var result = new BadRequestResult();
-                    filterContext.Result = result;
-                }
-                else
-                {
                     var result = new ContentResult();
-                    string content = JsonConvert.SerializeObject(filterContext.ModelState,
+                    IEnumerable<ModelError> allErrors = filterContext.ModelState.Values.SelectMany(v => v.Errors);
+                    string content = JsonConvert.SerializeObject(allErrors,
                         new JsonSerializerSettings
                         {
                             ReferenceLoopHandling = ReferenceLoopHandling.Ignore
@@ -26,9 +23,9 @@ namespace EA.Audit.Common.Infrastructure
                     result.Content = content;
                     result.ContentType = "application/json";
 
-                    filterContext.HttpContext.Response.StatusCode = 400;
+                    filterContext.HttpContext.Response.StatusCode = 422;
                     filterContext.Result = result;
-                }
+                
             }
         }
 

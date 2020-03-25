@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EA.Audit.AuditService.Tests
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EA.Audit.Subscriber", "EA.Audit.Subscriber\EA.Audit.Subscriber.csproj", "{8CB256E4-98F6-4E99-90EE-5908009B6E7C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EA.Audit.Common", "EA.Audit.Infrastructure\EA.Audit.Common.csproj", "{8627CE32-C4FC-41CD-860A-F118B28BAFE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EA.Audit.Common", "EA.Audit.Common\EA.Audit.Common.csproj", "{8627CE32-C4FC-41CD-860A-F118B28BAFE2}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "EA.Audit.SubscriberApi", "EA.Audit.SubscriberApi\EA.Audit.SubscriberApi.csproj", "{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}"
 EndProject

@@ -12,6 +12,7 @@
             public const string PublishAuditFailure = "Publish Audit Failed";
             public const string NoItemExists = "Item does not exist";
             public const string NoApplicationFound = "No Application found for ClientId";
+            public const string XRequestIdIsMissing = "x-requestid is missing in Headers";
         }
 
         public static class SuccessMessages
@@ -22,7 +23,19 @@
 
         public static class XRequest
         {
-            public const string XRequestId = "x-requestid";
+            public const string XRequestIdHeaderName = "x-requestid";
+        }
+
+        public static class Auth
+        {
+            public const string ReadAudits = "audit-api/read_audits";
+            public const string CreateAudits = "audit-api/create_audit";
+            public const string Admin = "audit-api/audit_admin";
+        }
+
+        public static class Redis
+        {
+            public const string AuditChannel = "AuditCommand";
         }
     }
 }

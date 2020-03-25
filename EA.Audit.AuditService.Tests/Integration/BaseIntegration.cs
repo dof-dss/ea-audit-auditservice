@@ -27,7 +27,7 @@ namespace EA.Audit.AuditService.Tests.Integration
             var services = new ServiceCollection();
 
             var mockAccessor = new Mock<IHttpContextAccessor>();
-            mockAccessor.Setup(x => x.HttpContext.Request.Headers[Constants.XRequest.XRequestId]).Returns(Guid.NewGuid().ToString());
+            mockAccessor.Setup(x => x.HttpContext.Request.Headers[Constants.XRequest.XRequestIdHeaderName]).Returns(Guid.NewGuid().ToString());
             mockAccessor.Setup(x => x.HttpContext.Request.Headers["Authorization"]).Returns(Guid.NewGuid().ToString());
             
             mockAccessor.Setup(x => x.HttpContext.Request.Scheme).Returns("http");

@@ -7,6 +7,7 @@ using EA.Audit.Common.Infrastructure;
 using EA.Audit.Common.Application.Features.Shared;
 using EA.Audit.Common.Infrastructure.Extensions;
 using EA.Audit.Common.Infrastructure.Functional;
+using FluentValidation;
 
 namespace EA.Audit.Common.Application.Queries
 {
@@ -24,6 +25,14 @@ namespace EA.Audit.Common.Application.Queries
         }
         public int PageNumber { get; set; }
         public int PageSize { get; set; }
+    }
+
+    public class GetAuditApplicationsQueryValidator : AbstractValidator<GetAuditApplicationsQuery>
+    {
+        public GetAuditApplicationsQueryValidator()
+        {
+            RuleFor(m => m.PageNumber).GreaterThan(0);
+        }
     }
 
     public class GetAuditApplicationQueryHandler : RequestHandler<GetAuditApplicationsQuery, Result<PagedResponse<ApplicationDto>>>

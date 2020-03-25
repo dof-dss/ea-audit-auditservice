@@ -8,6 +8,7 @@ using EA.Audit.Common.Infrastructure.Functional;
 using EA.Audit.Common.Infrastructure;
 using System.Threading;
 using EA.Audit.Common.Infrastructure.Extensions;
+using FluentValidation;
 
 namespace EA.Audit.Common.Application.Features.Audits.Queries
 {
@@ -15,7 +16,15 @@ namespace EA.Audit.Common.Application.Features.Audits.Queries
     { 
         public long Id { get; set; }
     }
-    
+
+    public class GetAuditDetailsQueryValidator : AbstractValidator<GetAuditDetailsQuery>
+    {
+        public GetAuditDetailsQueryValidator()
+        {
+            RuleFor(m => m.Id).GreaterThan(0);
+        }
+    }
+
     public class GetAuditDetailsQueryHandler : IRequestHandler<GetAuditDetailsQuery, Result<AuditDto>>
     {
         private readonly AuditContext _dbContext;

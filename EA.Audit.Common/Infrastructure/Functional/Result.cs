@@ -1,5 +1,4 @@
-﻿using NullGuard;
-using System;
+﻿using System;
 
 namespace EA.Audit.Common.Infrastructure.Functional
 {
@@ -68,7 +67,7 @@ namespace EA.Audit.Common.Infrastructure.Functional
             }
         }
 
-        protected internal Result([AllowNull] T value, bool isSuccess, string error)
+        protected internal Result(T value, bool isSuccess, string error)
             : base(isSuccess, error)
         {
             _value = value;

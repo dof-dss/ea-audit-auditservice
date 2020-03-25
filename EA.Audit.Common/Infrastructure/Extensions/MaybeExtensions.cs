@@ -1,5 +1,4 @@
 ﻿using EA.Audit.Common.Infrastructure.Functional;
-using NullGuard;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -7,7 +6,7 @@ namespace EA.Audit.Common.Infrastructure.Extensions
 {
     public static class MaybeExtensions
     {
-        public static Maybe<T> ToMaybe<T>([AllowNull] this T value) where T : class
+        public static Maybe<T> ToMaybe<T>(this T value) where T : class
         {
             return value != null
                 ? Maybe.Some(value)

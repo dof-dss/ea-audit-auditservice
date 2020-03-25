@@ -4,13 +4,13 @@ using EA.Audit.Common.Application.Commands;
 using EA.Audit.Common.Infrastructure.Extensions;
 using EA.Audit.Common.Application.Queries;
 using MediatR;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading.Tasks;
 using EA.Audit.Common.Infrastructure.Functional;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EA.Audit.AuditService.Controllers
 {
@@ -28,7 +28,7 @@ namespace EA.Audit.AuditService.Controllers
         }
 
         [HttpGet(ApiRoutes.AuditApplications.GetAll)]
-        /*[Authorize("audit-api/audit_admin")]*/
+        [Authorize(Constants.Auth.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -39,7 +39,7 @@ namespace EA.Audit.AuditService.Controllers
         }
 
         [HttpGet(ApiRoutes.AuditApplications.Get)]
-        /*[Authorize("audit-api/audit_admin")]*/
+        [Authorize(Constants.Auth.Admin)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -50,7 +50,7 @@ namespace EA.Audit.AuditService.Controllers
         }
 
         [HttpPost(ApiRoutes.AuditApplications.Create)]
-        /*[Authorize("audit-api/audit_admin")]*/
+        [Authorize(Constants.Auth.Admin)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateAuditApplicationAsync([FromBody]CreateAuditApplicationCommand command, [FromHeader(Name = "x-requestid")] string requestId)
@@ -73,7 +73,7 @@ namespace EA.Audit.AuditService.Controllers
             }
             else
             {
-                return BadRequest("x-requestid Header is missing");
+                return BadRequest(Constants.ErrorMessages.XRequestIdIsMissing);
             }
 
             return StatusCode(201);
