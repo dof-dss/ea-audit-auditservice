@@ -20,14 +20,11 @@ namespace EA.Audit.Common.Data
         public DbSet<AuditApplication> AuditApplications { get; set; }
         public DbSet<ClientRequest> ClientRequests { get; set; }
 
-        public string ClientId {    
-                                    get { 
-                                            return IsAdmin ? "Admin" : _clientId; 
-                                        }
-                                    set { 
-                                            _clientId = value; 
-                                        } 
-                                }
+        public string ClientId
+        {
+            get => _clientId;
+            set => _clientId = value;
+        }
 
         public bool IsAdmin { get; }
 

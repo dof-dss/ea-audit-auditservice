@@ -49,7 +49,7 @@ namespace EA.Audit.Common.Application.Features.Audits.Commands
             RuleFor(m => m.Subject).NotNull().Length(0, 500);
             RuleFor(m => m.Actor).NotNull().Length(0, 500);
             RuleFor(m => m.Description).NotNull().Length(0, 1000);
-            RuleFor(m => m.Properties).NotNull().Length(0, 1000);
+            RuleFor(m => m.Properties).NotNull().Length(0, 5000);
         }
     }
 

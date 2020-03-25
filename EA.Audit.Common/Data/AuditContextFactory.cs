@@ -23,11 +23,11 @@ namespace EA.Audit.Common.Data
             {
                 ValidateHttpContext();
 
-                //if (IsAdmin(_httpContext))
-                //{
+                if (IsAdmin(_httpContext))
+                {
                     //Admin Context
                     return new AuditContext(_options, true);
-                //}
+                }
 
                 var clientId = GetClientId(_httpContext);
                 return new AuditContext(_options, clientId);
