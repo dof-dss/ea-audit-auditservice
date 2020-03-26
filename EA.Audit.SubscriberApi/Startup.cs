@@ -32,7 +32,8 @@ namespace EA.Audit.SubscriberApi
             services.AddHttpContextAccessor();
             Action<MySqlDbContextOptionsBuilder> mySqlOptionsAction = (o) =>
                 o.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(60), null);
-            services.AddDbContext<AuditContext>(options => options.UseMySql(Configuration, mySqlOptionsAction));
+            services.AddDbContext<AuditContext>(options => options.UseMySql(Configuration, mySqlOptionsAction),
+                                                ServiceLifetime.Transient);
 
             services.AddRedisConnectionMultiplexer(Configuration);
             services.AddTransient<IAuditContextFactory, AuditContextFactory>();

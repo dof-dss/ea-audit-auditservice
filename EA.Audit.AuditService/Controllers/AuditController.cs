@@ -33,6 +33,7 @@ namespace EA.Audit.AuditService.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> GetAuditsAsync([FromQuery]GetAuditsQuery request)
         {
             var result = await _mediator.Send(request).ConfigureAwait(false);
@@ -43,6 +44,7 @@ namespace EA.Audit.AuditService.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [Authorize(Constants.Auth.ReadAudits)]
         public async Task<IActionResult> GetAuditAsync(int id)
         { 
@@ -58,6 +60,8 @@ namespace EA.Audit.AuditService.Controllers
         [Authorize(Constants.Auth.CreateAudits)]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status422UnprocessableEntity)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> CreateAuditAsync([FromBody]PublishAuditCommand command, [FromHeader(Name = Constants.XRequest.XRequestIdHeaderName)] string requestId)
         {
 

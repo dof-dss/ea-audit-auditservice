@@ -48,24 +48,20 @@ namespace EA.Audit.Common.Application.Features.Audits.Commands
                 RuleFor(m => m.Subject).NotNull().Length(0, 500);
                 RuleFor(m => m.Actor).NotNull().Length(0, 500);
                 RuleFor(m => m.Description).NotNull().Length(0, 1000);
-                RuleFor(m => m.Properties).NotNull().Length(0, 1000);
+                RuleFor(m => m.Properties).NotNull().Length(0, 5000);
             }
         }
     
     public class PublishAuditCommandHandler : IRequestHandler<PublishAuditCommand, Result<string>>
     {
-        private const string NoClientIdFound = "No ClientId on HttpContext";
-        private const string NoApplicationFound = "No Application found for ClientId";
         private readonly HttpContext _httpContext;
-        private readonly AuditContext _dbContext;
         private readonly IMapper _mapper;
         private readonly IConnectionMultiplexer _connectionMultiplexer;
         private readonly ILogger<PublishAuditCommandHandler> _logger;
 
-        public PublishAuditCommandHandler(IAuditContextFactory dbContextFactory, IMapper mapper, IHttpContextAccessor httpContentAccessor,
+        public PublishAuditCommandHandler(IMapper mapper, IHttpContextAccessor httpContentAccessor,
             IConnectionMultiplexer connectionMultiplexer, ILogger<PublishAuditCommandHandler> logger)
         {
-            _dbContext = dbContextFactory.AuditContext;
             _mapper = mapper;
             _httpContext = httpContentAccessor.HttpContext;
             _connectionMultiplexer = connectionMultiplexer;
@@ -75,24 +71,19 @@ namespace EA.Audit.Common.Application.Features.Audits.Commands
         public async Task<Result<string>> Handle(PublishAuditCommand command, CancellationToken cancellationToken)
         {
             _logger.LogDebug("Entering Handle()");
-            var createCommand = _mapper.Map<CreateAuditCommand>(command);            
+            var createCommand = _mapper.Map<CreateAuditCommand>(command); 
 
-            //Temp for Testing without Auth
-            /***************
-             * TODO Remove when SP is ready to use Auth
-             * ************/
-            var clientId = "3inpv3ubfmag4k97cu5iqsesg8";
-            //Get Client Id from Token and lookup Application
-            //var clientId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+            //Get Client Id from Token
+            var clientId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
 
             if (clientId == null)
             {
-                throw new Exception(NoClientIdFound);
+                return Result.Fail<string>(Constants.ErrorMessages.NoClientIdFound);
             }
 
             createCommand.ClientId = clientId;
             var publisher = _connectionMultiplexer.GetSubscriber();
-            var result = await publisher.PublishAsync("AuditCommand", JsonConvert.SerializeObject(createCommand), CommandFlags.FireAndForget);
+            var result = await publisher.PublishAsync(Constants.Redis.AuditChannel, JsonConvert.SerializeObject(createCommand), CommandFlags.FireAndForget);
 
             _logger.LogDebug("Exiting Handle()");
 

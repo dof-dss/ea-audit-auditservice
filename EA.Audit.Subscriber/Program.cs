@@ -36,7 +36,8 @@ namespace EA.Audit.Subscriber
 
                     Action<MySqlDbContextOptionsBuilder> mySqlOptionsAction = (o) =>
                         o.EnableRetryOnFailure(maxRetryCount: 15, maxRetryDelay: TimeSpan.FromSeconds(30), null);
-                    services.AddDbContext<AuditContext>(options => options.UseMySql(hostContext.Configuration, mySqlOptionsAction));
+                    services.AddDbContext<AuditContext>(options => options.UseMySql(hostContext.Configuration, mySqlOptionsAction),
+                                                ServiceLifetime.Transient);
 
                     services.AddElasticsearch(hostContext.Configuration);
 

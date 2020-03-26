@@ -13,6 +13,7 @@
             public const string NoItemExists = "Item does not exist";
             public const string NoApplicationFound = "No Application found for ClientId";
             public const string XRequestIdIsMissing = "x-requestid is missing in Headers";
+            public const string NoClientIdFound = "No ClientId found on HttpContext";
         }
 
         public static class SuccessMessages

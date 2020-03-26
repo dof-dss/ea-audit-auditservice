@@ -58,7 +58,7 @@ namespace EA.Audit.Common.Application.Commands
         {
             var app = _mapper.Map<CreateAuditApplicationCommand, AuditApplication>(command);
             //Overwrite ClientId in context for Application as it will be supplied, 
-            //not derived from Token, as Token will be an Admin Token as Admin function
+            //not derived from Token, as Token will be an Admin Token as this is an Admin function
             _dbContext.ClientId = command.ClientId;
 
             _dbContext.AuditApplications.Add(app);
