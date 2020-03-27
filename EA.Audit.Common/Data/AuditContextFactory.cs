@@ -36,13 +36,13 @@ namespace EA.Audit.Common.Data
 
         private string GetClientId(HttpContext httpContext)
         {
-            var clientId = _httpContext.User.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
+            var clientId = _httpContext.User?.Claims.FirstOrDefault(c => c.Type == "client_id")?.Value;
             return clientId;
         }
 
         private bool IsAdmin(HttpContext httpContext)
         {
-            var scopes = _httpContext.User.FindFirst(c => c.Type == "scope");
+            var scopes = _httpContext.User?.FindFirst(c => c.Type == "scope");
             if (scopes != null)
             {
                 if (scopes.Value.Split(' ').Any(s => s == "audit-api/audit_admin"))
