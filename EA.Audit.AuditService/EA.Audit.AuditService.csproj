@@ -2,6 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	<GenerateProgramFile>false</GenerateProgramFile>
+	<Configurations>Debug;Release;Sandbox;Production;Production</Configurations>
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="tests\**" />

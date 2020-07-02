@@ -1,0 +1,9 @@
+---
+applications:
+- name: ea-audit-auditsubscriber
+  buildpacks:
+  - dotnet_core_buildpack
+  memory: 256M
+  services:
+  - audit-mysql-service
+  - audit-redis-service
