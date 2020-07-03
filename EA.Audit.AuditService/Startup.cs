@@ -41,7 +41,7 @@ namespace EA.Audit.AuditService
         {
             var jwtSettings = JwtSettings.FromConfiguration(Configuration);
             services.AddSingleton(jwtSettings);
-            services.AddHttpContextAccessor();
+            //services.AddHttpContextAccessor();
 
             var assembly = AppDomain.CurrentDomain.Load("EA.Audit.Common");
             services.AddAutoMapper(assembly);
@@ -73,7 +73,7 @@ namespace EA.Audit.AuditService
 
         }
 
-        private void ConfigureAuthentication(IServiceCollection services)
+        protected virtual void ConfigureAuthentication(IServiceCollection services)
         {
             var authConfig = AuthConfig.FromConfiguration(Configuration);
             var authDomain = authConfig.AuthDomain;
@@ -139,6 +139,7 @@ namespace EA.Audit.AuditService
         private void ConfigureAuditContext(IServiceCollection services)
         {
             services.AddDbContext<AuditContext>(options => options.UseMySql(Configuration));
+            services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.TryAddSingleton(sp =>
             {
                 var builder = new DbContextOptionsBuilder<AuditContext>();
@@ -147,7 +148,7 @@ namespace EA.Audit.AuditService
         }
 
             // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
+        public virtual void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {          
             
             if (env.IsDevelopment())

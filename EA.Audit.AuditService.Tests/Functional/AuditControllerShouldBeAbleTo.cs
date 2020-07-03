@@ -8,6 +8,8 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EA.Audit.AuditService.Tests.Functional
 {
@@ -18,7 +20,17 @@ namespace EA.Audit.AuditService.Tests.Functional
 
         public AuditControllerShouldBeAbleTo()
         {
-            _client = new CustomWebApplicationFactory<Startup>().CreateClient();
+            var factory = new CustomWebApplicationFactory<TestStartup>().WithWebHostBuilder(builder =>
+            {
+                builder.UseSolutionRelativeContentRoot("EA.Audit.AuditService");
+
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddControllers().AddApplicationPart(typeof(Startup).Assembly);
+                    services.AddMvc().AddApplicationPart(typeof(Startup).Assembly);
+                });
+            });
+            _client = factory.CreateClient();
             _client.DefaultRequestHeaders.Add(Constants.XRequest.XRequestIdHeaderName, "b0ed668d-7ef2-4a23-a333-94ad278f45d7");
         }
 

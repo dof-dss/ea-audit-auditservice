@@ -11,6 +11,8 @@ using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace EA.Audit.AuditService.Tests.Functional
 {
@@ -21,7 +23,17 @@ namespace EA.Audit.AuditService.Tests.Functional
 
         public AuditApplicationControllerShouldBeAbleTo()
         {
-            _client = new CustomWebApplicationFactory<Startup>().CreateClient();
+            var factory = new CustomWebApplicationFactory<TestStartup>().WithWebHostBuilder(builder =>
+            {
+                builder.UseSolutionRelativeContentRoot("EA.Audit.AuditService");
+
+                builder.ConfigureTestServices(services =>
+                {
+                    services.AddControllers().AddApplicationPart(typeof(Startup).Assembly);
+                    services.AddMvc().AddApplicationPart(typeof(Startup).Assembly);
+                });
+            });
+            _client = factory.CreateClient();
             _client.DefaultRequestHeaders.Add(Constants.XRequest.XRequestIdHeaderName, "b0ed668d-7ef2-4a23-a333-94ad278f45d7");
         }
 
@@ -29,7 +41,7 @@ namespace EA.Audit.AuditService.Tests.Functional
         public async Task GetAllForApplication()
         {
             //Act
-            var response = await _client.GetAsync("/api/v1/applications?PageNumber=0&PageSize=1");
+            var response = await _client.GetAsync("/api/v1/applications?PageNumber=1&PageSize=1");
             response.EnsureSuccessStatusCode();
             var stringResponse = await response.Content.ReadAsStringAsync();
 
