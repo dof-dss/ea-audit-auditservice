@@ -133,7 +133,7 @@ jobs:
       - run: 
           name: "Deploy Subscriber to GOV UK PaaS"
           command: |
-            cd tmp/EA.UsageTracking.Subscriber.API/bin/Production/netcoreapp3.1/publish
+            cd tmp/EA.Audit.SubscriberApi/bin/Production/netcoreapp3.1/publish
             cf push
 workflows:
   build-and-test-and-deploy-sandbox:
