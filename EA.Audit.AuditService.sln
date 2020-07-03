@@ -27,6 +27,9 @@ Global
 		Sandbox|Any CPU = Sandbox|Any CPU
 		Sandbox|x64 = Sandbox|x64
 		Sandbox|x86 = Sandbox|x86
+		Staging|Any CPU = Staging|Any CPU
+		Staging|x64 = Staging|x64
+		Staging|x86 = Staging|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -53,6 +56,12 @@ Global
 		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Sandbox|x64.Build.0 = Sandbox|Any CPU
 		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Sandbox|x86.ActiveCfg = Sandbox|Any CPU
 		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Sandbox|x86.Build.0 = Sandbox|Any CPU
+		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Staging|x64.Build.0 = Staging|Any CPU
+		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{CDF94F18-399B-442D-9AE7-1AF462455E59}.Staging|x86.Build.0 = Staging|Any CPU
 		{F9E65EC5-9568-4527-BD16-701FB4416784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{F9E65EC5-9568-4527-BD16-701FB4416784}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F9E65EC5-9568-4527-BD16-701FB4416784}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -77,6 +86,12 @@ Global
 		{F9E65EC5-9568-4527-BD16-701FB4416784}.Sandbox|x64.Build.0 = Sandbox|Any CPU
 		{F9E65EC5-9568-4527-BD16-701FB4416784}.Sandbox|x86.ActiveCfg = Sandbox|Any CPU
 		{F9E65EC5-9568-4527-BD16-701FB4416784}.Sandbox|x86.Build.0 = Sandbox|Any CPU
+		{F9E65EC5-9568-4527-BD16-701FB4416784}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{F9E65EC5-9568-4527-BD16-701FB4416784}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{F9E65EC5-9568-4527-BD16-701FB4416784}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{F9E65EC5-9568-4527-BD16-701FB4416784}.Staging|x64.Build.0 = Staging|Any CPU
+		{F9E65EC5-9568-4527-BD16-701FB4416784}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{F9E65EC5-9568-4527-BD16-701FB4416784}.Staging|x86.Build.0 = Staging|Any CPU
 		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -101,6 +116,12 @@ Global
 		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Sandbox|x64.Build.0 = Sandbox|Any CPU
 		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Sandbox|x86.ActiveCfg = Sandbox|Any CPU
 		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Sandbox|x86.Build.0 = Sandbox|Any CPU
+		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Staging|x64.Build.0 = Staging|Any CPU
+		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{8CB256E4-98F6-4E99-90EE-5908009B6E7C}.Staging|x86.Build.0 = Staging|Any CPU
 		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -125,6 +146,12 @@ Global
 		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Sandbox|x64.Build.0 = Sandbox|Any CPU
 		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Sandbox|x86.ActiveCfg = Sandbox|Any CPU
 		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Sandbox|x86.Build.0 = Sandbox|Any CPU
+		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Staging|x64.Build.0 = Staging|Any CPU
+		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{8627CE32-C4FC-41CD-860A-F118B28BAFE2}.Staging|x86.Build.0 = Staging|Any CPU
 		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Debug|x64.ActiveCfg = Debug|Any CPU
@@ -149,6 +176,12 @@ Global
 		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Sandbox|x64.Build.0 = Sandbox|Any CPU
 		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Sandbox|x86.ActiveCfg = Sandbox|Any CPU
 		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Sandbox|x86.Build.0 = Sandbox|Any CPU
+		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Staging|Any CPU.ActiveCfg = Staging|Any CPU
+		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Staging|Any CPU.Build.0 = Staging|Any CPU
+		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Staging|x64.ActiveCfg = Staging|Any CPU
+		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Staging|x64.Build.0 = Staging|Any CPU
+		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Staging|x86.ActiveCfg = Staging|Any CPU
+		{DA764C3A-2BAC-4AC3-9FF6-AD02418A9B5D}.Staging|x86.Build.0 = Staging|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

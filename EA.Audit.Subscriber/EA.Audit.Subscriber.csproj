@@ -3,7 +3,7 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <Configurations>Debug;Release;Sandbox;Production</Configurations>
+    <Configurations>Debug;Release;Sandbox;Production;Staging</Configurations>
   </PropertyGroup>
 
   <ItemGroup>
