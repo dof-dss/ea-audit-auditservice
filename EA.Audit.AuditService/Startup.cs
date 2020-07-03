@@ -69,8 +69,12 @@ namespace EA.Audit.AuditService
             services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ExceptionBehaviour<,>));
             services.AddTransient<IAuditContextFactory, AuditContextFactory>();
 
-            services.AddRedisConnectionMultiplexer(Configuration);
+            ConfigureRedis(services);
 
+        }
+        protected virtual void ConfigureRedis(IServiceCollection services)
+        {
+            services.AddRedisConnectionMultiplexer(Configuration);
         }
 
         protected virtual void ConfigureAuthentication(IServiceCollection services)

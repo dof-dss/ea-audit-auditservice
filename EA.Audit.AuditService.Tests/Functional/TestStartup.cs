@@ -1,4 +1,5 @@
-﻿using EA.Audit.Common.Infrastructure;
+﻿using EA.Audit.AuditService.Tests.Integration;
+using EA.Audit.Common.Infrastructure;
 using EA.Audit.Common.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
@@ -7,6 +8,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using Moq;
+using StackExchange.Redis;
 
 namespace EA.Audit.AuditService.Tests.Functional
 {
@@ -42,12 +45,12 @@ namespace EA.Audit.AuditService.Tests.Functional
 
         }
 
-        //protected override void ConfigureRedis(IServiceCollection services)
-        //{
-        //    var mockConnectionMultiplexer = new Mock<IConnectionMultiplexer>();
-        //    mockConnectionMultiplexer.Setup(x => x.GetSubscriber(null)).Returns(new FakeSubscriber());
-        //    services.AddSingleton(mockConnectionMultiplexer.Object);
-        //}
+        protected override void ConfigureRedis(IServiceCollection services)
+        {
+            var mockConnectionMultiplexer = new Mock<IConnectionMultiplexer>();
+            mockConnectionMultiplexer.Setup(x => x.GetSubscriber(null)).Returns(new FakeSubscriber());
+            services.AddSingleton(mockConnectionMultiplexer.Object);
+        }
 
         public override void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
