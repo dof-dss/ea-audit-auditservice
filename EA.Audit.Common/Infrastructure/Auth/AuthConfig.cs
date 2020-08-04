@@ -12,7 +12,7 @@ namespace EA.Audit.Common.Infrastructure.Auth
 
         public static AuthConfig FromConfiguration(IConfiguration configuration)
         {
-            var authDomain = configuration["auth:authDomain"] ?? "defaultAuthDomain";
+            var authDomain = configuration["issuer"] ?? "defaultAuthDomain";
 
 
             return new AuthConfig(authDomain);
