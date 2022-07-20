@@ -141,7 +141,6 @@ workflows:
       - test
       - build:
           requires:
-            - test
       - publish:
           manifest: "manifest.sandbox.yml"
           requires:
@@ -176,7 +175,6 @@ workflows:
           manifest: "manifest.staging.yml"
           configuration: "Staging"
           requires:
-            - test
             - build
           filters:    # selected tags and no branches
             tags:
