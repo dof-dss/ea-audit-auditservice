@@ -27,17 +27,6 @@ commands:
             cf target -o << parameters.org >>  -s << parameters.space >> 
 
 jobs:
-  test:
-    executor:
-      name: windows/default
-    steps:
-      - checkout
-      - run:
-          name: "Install project dependencies"
-          command: dotnet restore
-      - run:
-          name: "Run Application Tests"
-          command: dotnet test
   build:
     executor:
       name: windows/default
@@ -138,7 +127,6 @@ jobs:
 workflows:
   build-and-test-and-deploy-sandbox:
     jobs:
-      - test
       - build:
           requires:
             - test
@@ -158,12 +146,6 @@ workflows:
           context: govuk-paas-sandbox
   build-and-test-and-deploy-staging:
     jobs:
-      - test:
-          filters:    # selected tags and no branches
-            tags:
-              only: /^v(0|[0-9]\d*)\.(0|[0-9]\d*)\.(0|[0-9]\d*)(?:-(alpha|beta))?$/
-            branches:
-              ignore: /.*/
       - build:
           requires:
             - test
@@ -196,12 +178,6 @@ workflows:
           context: govuk-paas-staging
   build-and-test-and-deploy-production:
     jobs:
-      - test:
-          filters:    # selected tags and no branches
-            tags:
-              only: /^v(0|[0-9]\d*)\.(0|[0-9]\d*)\.(0|[0-9]\d*)(?:-(alpha|beta))?$/
-            branches:
-              ignore: /.*/
       - build:
           requires:
             - test
