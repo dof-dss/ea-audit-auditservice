@@ -131,7 +131,7 @@ workflows:
       - test
       - build:
           requires:
-            - test
+          - test
       - publish:
           manifest: "manifest.sandbox.yml"
           requires:
@@ -229,4 +229,3 @@ workflows:
             branches:
               ignore: /.*/
           context: govuk-paas-production
-
