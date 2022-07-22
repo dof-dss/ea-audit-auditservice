@@ -141,11 +141,9 @@ workflows:
       - test
       - build:
           requires:
-            - test
       - publish:
           manifest: "manifest.sandbox.yml"
           requires:
-            - test
             - build
           filters:
             branches:
@@ -166,7 +164,6 @@ workflows:
               ignore: /.*/
       - build:
           requires:
-            - test
           filters:    # selected tags and no branches
             tags:
               only: /^v(0|[0-9]\d*)\.(0|[0-9]\d*)\.(0|[0-9]\d*)(?:-(alpha|beta))?$/
@@ -176,7 +173,6 @@ workflows:
           manifest: "manifest.staging.yml"
           configuration: "Staging"
           requires:
-            - test
             - build
           filters:    # selected tags and no branches
             tags:
@@ -204,7 +200,6 @@ workflows:
               ignore: /.*/
       - build:
           requires:
-            - test
           filters:    # selected tags and no branches
             tags:
               only: /^v(0|[0-9]\d*)\.(0|[0-9]\d*)\.(0|[0-9]\d*)(?:-(alpha|beta))?$/
@@ -214,7 +209,6 @@ workflows:
           manifest: "manifest.production.yml"
           configuration: "Production"
           requires:
-            - test
             - build
           filters:    # selected tags and no branches
             tags:
