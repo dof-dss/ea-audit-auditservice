@@ -30,12 +30,7 @@ jobs:
     executor:
       name: windows/default
     steps:
-      - run:
-          name: "Install project dependencies"
-          command: dotnet restore
-      - run:
-          name: "Run Application Tests"
-          command: dotnet test
+      - checkout
   build:
     executor:
       name: windows/default
@@ -237,3 +232,4 @@ workflows:
             branches:
               ignore: /.*/
           context: govuk-paas-production
+          
