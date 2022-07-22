@@ -137,11 +137,14 @@ jobs:
 workflows:
   build-and-test-and-deploy-sandbox:
     jobs:
+      - test
       - build:
           requires:
+          - test
       - publish:
           manifest: "manifest.sandbox.yml"
           requires:
+            - test
             - build
           filters:
             branches:
@@ -235,4 +238,3 @@ workflows:
             branches:
               ignore: /.*/
           context: govuk-paas-production
-          
