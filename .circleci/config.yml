@@ -26,11 +26,6 @@ commands:
             echo "$CF_SPACE" 
             cf target -o << parameters.org >>  -s << parameters.space >> 
 jobs:
-  test:
-    executor:
-      name: windows/default
-    steps:
-      - checkout
   build:
     executor:
       name: windows/default
