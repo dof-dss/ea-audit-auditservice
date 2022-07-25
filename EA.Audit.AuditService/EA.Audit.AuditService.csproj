@@ -40,4 +40,5 @@
   <ItemGroup>
     <ProjectReference Include="..\EA.Audit.Common\EA.Audit.Common.csproj" />
   </ItemGroup>
+  <GenerateRuntimeConfigDevFile>false</GenerateRuntimeConfigDevFile>
 </Project>
