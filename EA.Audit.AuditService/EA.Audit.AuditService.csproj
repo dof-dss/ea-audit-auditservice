@@ -2,7 +2,7 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
 	<GenerateProgramFile>false</GenerateProgramFile>
-	<GenerateRuntimeConfigurationFiles>false</GenerateRuntimeConfigurationFiles>
+	<GenerateRuntimeConfigDevFile>false</GenerateRuntimeConfigDevFile>
 	<Configurations>Debug;Release;Sandbox;Production;Staging</Configurations>
   </PropertyGroup>
   <ItemGroup>
