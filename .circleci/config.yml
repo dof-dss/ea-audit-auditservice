@@ -44,7 +44,7 @@ jobs:
       - checkout
       - run:
           name: "Build Application"
-          command: dotnet build
+          command: dotnet --version
   publish:
     parameters:
       manifest:
