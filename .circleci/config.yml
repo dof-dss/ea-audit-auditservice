@@ -18,7 +18,7 @@ commands:
           name: "Install and configure Cloud Foundry CLI"
           command: |
             Set-ExecutionPolicy Bypass -Scope Process -Force; [System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
-            choco install cloudfoundry-cli --version=6.51.0
+            choco install cloudfoundry-cli --version=8.4.0
             cf -v
             cf api https://api.london.cloud.service.gov.uk
             cf auth "$CF_USERNAME" "$CF_PASSWORD"
@@ -44,7 +44,7 @@ jobs:
       - checkout
       - run:
           name: "Build Application"
-          command: dotnet --version
+          command: dotnet build
   publish:
     parameters:
       manifest:
