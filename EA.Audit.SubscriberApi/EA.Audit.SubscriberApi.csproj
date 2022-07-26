@@ -3,7 +3,6 @@
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
     <Configurations>Debug;Release;Sandbox;Production;Staging</Configurations>
-	<GenerateRuntimeConfiguarationFiles>false</GenerateRuntimeConfiguarationFiles>
   </PropertyGroup>
 
   <ItemGroup>
