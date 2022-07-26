@@ -58,7 +58,7 @@ jobs:
       - checkout
       - run:
           name: "Publish Application"
-          command: dotnet publish -c << parameters.configuration >> -r linux-x64 --self-contained false
+          command: dotnet publish -c << parameters.configuration >> -r linux-x64
       - run: 
           name: "Copy Manifest files to API publish directory"
           command: |
